@@ -30,6 +30,16 @@ listContainer.addEventListener(
       e.target.parentElement.remove();
       saveData();
     }
+    else if (e.target.tagName === "BUTTON") {
+      let li = e.target.parentElement;
+      let text = li.firstChild;
+      let newText = prompt("Atualize sua tarefa:");
+    
+      if (newText !== null && newText.trim() !== "") {
+        text.textContent = newText;
+      }
+    }
+    saveData();
   },
   false
 );
@@ -40,25 +50,11 @@ inputBox.addEventListener("keypress", function (e) {
   }
 });
 
-listContainer.addEventListener("click", function (e) {
-  if (e.target.tagName === "BUTTON") {
-    let li = e.target.parentElement;
-    let text = li.firstChild;
-    let newText = prompt("Atualize sua tarefa:");
-
-    if (newText !== null && newText.trim() !== "") {
-      text.textContent = newText;
-    }
-  }
-  saveData();
-});
-
 function saveData() {
   localStorage.setItem("data", listContainer.innerHTML);
 }
 function showTask() {
   listContainer.innerHTML = localStorage.getItem("data");
-  const listItems = listContainer.querySelectorAll("li");
-  listItems.forEach((item) => addEditFunctionality(item));
+  listContainer.querySelectorAll("li");
 }
 showTask();
