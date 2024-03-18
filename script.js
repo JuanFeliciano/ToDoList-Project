@@ -1,6 +1,6 @@
 const inputBox = document.getElementById("input-box");
 const listContainer = document.getElementById("list-container");
-
+let tasksTotal = [];
 function addTask() {
   if (inputBox.value === "") {
     alert("Você precisa escrever algo!");
@@ -10,6 +10,7 @@ function addTask() {
     listContainer.appendChild(li);
     let span = document.createElement("span");
     let editTask = document.createElement("button");
+    tasksTotal.push(li.textContent);
     span.innerHTML = "🗑️";
     editTask.innerHTML = "✏️";
 
@@ -23,18 +24,18 @@ function addTask() {
 listContainer.addEventListener(
   "click",
   function (e) {
-    if (e.target.tagName === "LI") {
+    indexTask = e.target.tagName;
+    if (indexTask === "LI") {
       e.target.classList.toggle("checked");
       saveData();
-    } else if (e.target.tagName === "SPAN") {
+    } else if (indexTask === "SPAN") {
       e.target.parentElement.remove();
       saveData();
-    }
-    else if (e.target.tagName === "BUTTON") {
+    } else if (indexTask === "BUTTON") {
       let li = e.target.parentElement;
       let text = li.firstChild;
       let newText = prompt("Atualize sua tarefa:");
-    
+
       if (newText !== null && newText.trim() !== "") {
         text.textContent = newText;
       }
@@ -51,10 +52,17 @@ inputBox.addEventListener("keypress", function (e) {
 });
 
 function saveData() {
-  localStorage.setItem("data", listContainer.innerHTML);
+  localStorage.setItem("tasks", JSON.stringify(tasksTotal));
 }
 function showTask() {
-  listContainer.innerHTML = localStorage.getItem("data");
-  listContainer.querySelectorAll("li");
+  const storedTasks = localStorage.getItem("tasks");
+  if (storedTasks) {
+    tasksTotal = JSON.parse(storedTasks);
+    tasksTotal.forEach((task) => {
+      let li = document.createElement("li");
+      li.textContent = task;
+      listContainer.appendChild(li);
+    });
+  }
 }
 showTask();
