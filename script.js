@@ -1,49 +1,111 @@
+class Task {
+  constructor(id, description, completed = false) {
+    this.id = id;
+    this.description = description;
+    this.completed = completed;
+  }
+}
+
 const inputBox = document.getElementById("input-box");
 const listContainer = document.getElementById("list-container");
+const buttonDel = document.getElementById("buttonDel");
 let tasksTotal = [];
-function addTask() {
-  if (inputBox.value === "") {
-    alert("Você precisa escrever algo!");
-  } else {
-    let li = document.createElement("li");
-    li.innerHTML = inputBox.value;
-    listContainer.appendChild(li);
-    let span = document.createElement("span");
-    let editTask = document.createElement("button");
-    tasksTotal.push(li.textContent);
-    span.innerHTML = "🗑️";
-    editTask.innerHTML = "✏️";
 
-    li.appendChild(span);
-    li.appendChild(editTask);
+function addTask() {
+  if (inputBox.value.trim() === "") {
+    alert("You need write something!");
+  } else {
+    const newTask = new Task(tasksTotal.length, inputBox.value);
+    tasksTotal.push(newTask);
+    renderTask(newTask);
   }
   inputBox.value = "";
   saveData();
 }
 
-listContainer.addEventListener(
-  "click",
-  function (e) {
-    indexTask = e.target.tagName;
-    if (indexTask === "LI") {
-      e.target.classList.toggle("checked");
-      saveData();
-    } else if (indexTask === "SPAN") {
-      e.target.parentElement.remove();
-      saveData();
-    } else if (indexTask === "BUTTON") {
-      let li = e.target.parentElement;
-      let text = li.firstChild;
-      let newText = prompt("Atualize sua tarefa:");
+function renderTask(task) {
+  const li = document.createElement("li");
+  li.textContent = task.description;
 
-      if (newText !== null && newText.trim() !== "") {
-        text.textContent = newText;
-      }
-    }
+  const span = document.createElement("span");
+  span.innerHTML = "🗑️";
+  span.addEventListener("click", () => deleteTask(task.id));
+
+  const editTask = document.createElement("button");
+  editTask.innerHTML = "✏️";
+  editTask.addEventListener("click", () => editTaskDescription(task));
+
+  li.appendChild(span);
+  li.appendChild(editTask);
+
+  listContainer.appendChild(li);
+}
+
+function deleteTask(taskId) {
+  let confirmation = confirm("Are you sure about this action?");
+  if (confirmation) {
+    tasksTotal = tasksTotal.filter((task) => task.id !== taskId);
     saveData();
-  },
-  false
-);
+    refreshTasks();
+  }
+}
+
+function editTaskDescription(task) {
+  const li = listContainer.childNodes[task.id];
+  const span = li.querySelector("span");
+  const editInput = document.createElement("input");
+  editInput.type = "text";
+  editInput.value = task.description;
+
+  li.replaceChild(editInput, span);
+  editInput.focus();
+
+  editInput.addEventListener("keypress", function (e) {
+    if (e.key === "Enter") {
+      task.description = editInput.value;
+      saveData();
+      refreshTasks();
+    }
+  });
+
+  editInput.addEventListener("blur", function () {
+    task.description = editInput.value;
+    saveData();
+    refreshTasks();
+  });
+}
+
+function refreshTasks() {
+  listContainer.innerHTML = "";
+  tasksTotal.forEach((task) => renderTask(task));
+}
+
+buttonDel.addEventListener("click", function (e) {
+  const confirmacao = confirm("Are you sure about this action?");
+  if (confirmacao) {
+    localStorage.clear();
+    tasksTotal = [];
+    refreshTasks();
+    saveData();
+  }
+});
+
+listContainer.addEventListener("click", function (e) {
+  const target = e.target;
+  if (target.tagName === "LI") {
+    const taskId = parseInt(target.dataset.taskId);
+    const task = tasksTotal.find((task) => task.id === taskId);
+    task.completed = !task.completed;
+
+    if (task.completed) {
+      target.classList.add("checked");
+    } else {
+      target.classList.remove("checked");
+    }
+
+    saveData();
+  }
+});
 
 inputBox.addEventListener("keypress", function (e) {
   if (e.key === "Enter") {
@@ -54,15 +116,13 @@ inputBox.addEventListener("keypress", function (e) {
 function saveData() {
   localStorage.setItem("tasks", JSON.stringify(tasksTotal));
 }
-function showTask() {
-  const storedTasks = localStorage.getItem("tasks");
-  if (storedTasks) {
-    tasksTotal = JSON.parse(storedTasks);
-    tasksTotal.forEach((task) => {
-      let li = document.createElement("li");
-      li.textContent = task;
-      listContainer.appendChild(li);
-    });
+
+function loadData() {
+  const data = localStorage.getItem("tasks");
+  if (data) {
+    tasksTotal = JSON.parse(data);
+    refreshTasks();
   }
 }
-showTask();
+
+loadData();
