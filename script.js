@@ -26,6 +26,8 @@ function addTask() {
 function renderTask(task) {
   const li = document.createElement("li");
   li.textContent = task.description;
+  li.dataset.taskId = task.id;
+  li.classList.add("task-item");
 
   const span = document.createElement("span");
   span.innerHTML = "🗑️";
@@ -81,8 +83,8 @@ function refreshTasks() {
 }
 
 buttonDel.addEventListener("click", function (e) {
-  const confirmacao = confirm("Are you sure about this action?");
-  if (confirmacao) {
+  const confirmation = confirm("Are you sure about this action?");
+  if (confirmation) {
     localStorage.clear();
     tasksTotal = [];
     refreshTasks();
@@ -122,6 +124,23 @@ function loadData() {
   if (data) {
     tasksTotal = JSON.parse(data);
     refreshTasks();
+
+    document.querySelectorAll("#list-container li").forEach((item) => {
+      item.addEventListener("click", function (e) {
+        const taskId = parseInt(item.dataset.taskId);
+        const task = tasksTotal.find((task) => task.id === taskId);
+        if (task) {
+          task.completed = !task.completed;
+
+          if (task.completed) {
+            item.classList.add("checked");
+          } else {
+            item.classList.remove("checked");
+          }
+          saveData();
+        }
+      });
+    });
   }
 }
 
