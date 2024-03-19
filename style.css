@@ -123,3 +123,14 @@ ul li button {
 ul li button:hover {
   background: #edeef0;
 }
+
+#buttonDel {
+  border: none;
+  outline: none;
+  padding: 16px 30px;
+  background: #ff5945;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 40px;
+}
