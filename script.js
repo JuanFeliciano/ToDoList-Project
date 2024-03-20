@@ -54,12 +54,12 @@ function deleteTask(taskId) {
 
 function editTaskDescription(task) {
   const li = listContainer.childNodes[task.id];
-  const span = li.querySelector("span");
+  const button = li.querySelector("button");
   const editInput = document.createElement("input");
   editInput.type = "text";
   editInput.value = task.description;
 
-  li.replaceChild(editInput, span);
+  li.replaceChild(editInput, button);
   editInput.focus();
 
   editInput.addEventListener("keypress", function (e) {
@@ -68,12 +68,6 @@ function editTaskDescription(task) {
       saveData();
       refreshTasks();
     }
-  });
-
-  editInput.addEventListener("blur", function () {
-    task.description = editInput.value;
-    saveData();
-    refreshTasks();
   });
 }
 
@@ -126,21 +120,26 @@ function loadData() {
     refreshTasks();
 
     document.querySelectorAll("#list-container li").forEach((item) => {
-      item.addEventListener("click", function (e) {
-        const taskId = parseInt(item.dataset.taskId);
-        const task = tasksTotal.find((task) => task.id === taskId);
-        if (task) {
-          task.completed = !task.completed;
-
-          if (task.completed) {
-            item.classList.add("checked");
-          } else {
-            item.classList.remove("checked");
-          }
-          saveData();
-        }
-      });
+      item.removeEventListener("click", toggleTaskCompletion);
+      item.addEventListener("click", toggleTaskCompletion);
     });
+  }
+}
+
+function toggleTaskCompletion(e) {
+  const target = e.target;
+  if (target.tagName === "LI") {
+    const taskId = parseInt(target.dataset.taskId);
+    const task = tasksTotal.find((task) => task.id === taskId);
+    task.completed = !task.completed;
+
+    if (task.completed) {
+      target.classList.add("checked");
+    } else {
+      target.classList.remove("checked");
+    }
+
+    saveData();
   }
 }
 
