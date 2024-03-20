@@ -15,7 +15,14 @@ function addTask() {
   if (inputBox.value.trim() === "") {
     alert("You need write something!");
   } else {
-    const newTask = new Task(tasksTotal.length, inputBox.value);
+    const newId =
+      tasksTotal.length > 0
+        ? tasksTotal.reduce(
+            (maxId, task) => Math.max(maxId, task.id),
+            tasksTotal[0].id
+          ) + 1
+        : 0;
+    const newTask = new Task(newId, inputBox.value);
     tasksTotal.push(newTask);
     renderTask(newTask);
   }
@@ -53,7 +60,7 @@ function deleteTask(taskId) {
 }
 
 function editTaskDescription(task) {
-  const li = listContainer.childNodes[task.id];
+  const li = document.querySelector(`[data-task-id="${task.id}"]`);
   const button = li.querySelector("button");
   const editInput = document.createElement("input");
   editInput.type = "text";
