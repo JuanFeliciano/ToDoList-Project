@@ -63,11 +63,21 @@ function editTaskDescription(task) {
   const li = document.querySelector(`[data-task-id="${task.id}"]`);
   const button = li.querySelector("button");
   const editInput = document.createElement("input");
+  const editButton = document.createElement("button");
+  editButton.innerHTML = "✏️";
   editInput.type = "text";
+  editInput.className = "editInput";
   editInput.value = task.description;
+  li.appendChild(editButton);
 
   li.replaceChild(editInput, button);
   editInput.focus();
+
+  editButton.addEventListener("click", () => {
+    task.description = editInput.value;
+    saveData();
+    refreshTasks();
+  });
 
   editInput.addEventListener("keypress", function (e) {
     if (e.key === "Enter") {
