@@ -135,3 +135,11 @@ ul li button:hover {
   cursor: pointer;
   border-radius: 40px;
 }
+
+.editInput {
+  font-family: Georgia, "Times New Roman", Times, serif;
+}
+
+.task-item {
+  font-weight: 545;
+}
