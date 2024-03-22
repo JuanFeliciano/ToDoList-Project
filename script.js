@@ -32,6 +32,10 @@ function addTask() {
 
 function renderTask(task) {
   const li = document.createElement("li");
+  li.draggable = true;
+  li.addEventListener("dragstart", dragStart);
+  li.addEventListener("dragover", dragOver);
+  li.addEventListener("drop", drop);
   li.textContent = task.description;
   li.dataset.taskId = task.id;
   li.classList.add("task-item");
@@ -48,6 +52,34 @@ function renderTask(task) {
   li.appendChild(editTask);
 
   listContainer.appendChild(li);
+}
+
+function dragStart(e) {
+  e.dataTransfer.setData("text/plain", e.target.dataset.taskId);
+}
+
+// Função para permitir que um elemento seja arrastado sobre o elemento alvo
+function dragOver(e) {
+  e.preventDefault();
+}
+
+// Função para manipular a soltura da tarefa
+function drop(e) {
+  e.preventDefault();
+  const taskId = parseInt(e.dataTransfer.getData("text/plain"));
+  const task = tasksTotal.find((task) => task.id === taskId);
+  const droppedIndex = [...listContainer.children].indexOf(e.target);
+
+  // Remova a tarefa da sua posição original
+  const index = tasksTotal.indexOf(task);
+  tasksTotal.splice(index, 1);
+
+  // Insira a tarefa na nova posição
+  tasksTotal.splice(droppedIndex, 0, task);
+
+  // Atualize a lista de tarefas
+  refreshTasks();
+  saveData();
 }
 
 function deleteTask(taskId) {
